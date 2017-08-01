@@ -3,7 +3,7 @@ package drone
 import (
 	l "getswift/location"
 	p "getswift/parcel"
-	"fmt"
+	// "fmt"
 	"io/ioutil"
 	"net/http"	
 	// "github.com/gorilla/schema"
@@ -11,27 +11,17 @@ import (
 )
 
 type Drone struct {
-	DroneId 	int `json:"droneId"`
-	Location 	l.Location `json:"location"`
-	Packages 	[]p.Parcel `json:"packages"`
-	DistanceDepot float64
-}
-type Drones struct {
-	drones 		[]Drone
-}
-
-func ListDrones() {
-	resp, err := http.Get("https://codetest.kube.getswift.co/drones")
-	if err != nil {
-		// handle error
-	}
-	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
-	fmt.Println(string(body))
+	DroneId 			int `json:"droneId"`
+	Location 			l.Location `json:"location"`
+	Packages 			[]p.Parcel `json:"packages"`
+	DistanceDepot 		float64
+	DepotTime 			float64
+	DeliveryDistance	float64
+	DeliveryTime 		float64
 }
 
-func GetDrones(r *http.Request) ([]byte){
-	resp, err := http.Get("https://codetest.kube.getswift.co/drones")
+func GetDrones(r *http.Request) ([]byte) {
+	resp, err := http.Get("https://codetest.kube.getswift.co/drones") //Retrieve initial list of Drones
 	if err != nil {
 		// handle error
 		panic(err.Error())
@@ -41,27 +31,42 @@ func GetDrones(r *http.Request) ([]byte){
 
 	dat := make([]Drone,0)	
 
-    if err := json.Unmarshal([]byte(body), &dat); err != nil {
+    if err := json.Unmarshal([]byte(body), &dat); err != nil { //Load HTTP Response into JSON
         panic(err)
     }
-    fmt.Println(dat)
-    fmt.Printf("%#v", dat)
 
-    for i := 0; i < len(dat); i++ {
+    for i := 0; i < len(dat); i++ { //Calculate starting distances
     	
-    	dat[i].DistanceFromDepot
+    	dat[i].DistanceFromDepot() 
+    	dat[i].DistanceFromDelivery()
 	}
 
     out, _ := json.Marshal(dat)
     return out    
 }
 
-func (drone *Drone) DistanceFromDepot()(float64) {
+func UpdateDronePositions(r *http.Request) ([]byte) {
+	dat := make([]Drone,0)	
+	out, _ := json.Marshal(dat)
+    return out  
+}
+
+func (drone *Drone) DistanceFromDepot() {
 
 	var depotLocation l.Location
-	depotLocation.Longitude = -37.816480 //Taken from Google Maps
-	depotLocation.Latitude = 144.963844
+	depotLocation.Latitude = -37.816664 //Taken from Google Maps
+	depotLocation.Longitude = 144.963848
 
 	drone.DistanceDepot = depotLocation.DistanceBetween(drone.Location)
+	drone.DepotTime = drone.DistanceDepot / 20 * 3600;
+
+}
+
+func (drone *Drone) DistanceFromDelivery() {
+
+	if len(drone.Packages) > 0 {
+		drone.DeliveryDistance = drone.Packages[0].Destination.DistanceBetween(drone.Location)
+		drone.DeliveryTime = drone.DeliveryDistance / 20 * 3600;
+	}
 
 }
