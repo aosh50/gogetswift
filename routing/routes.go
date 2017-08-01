@@ -33,4 +33,10 @@ var routes = Routes{
 		"/packages",
 		Packages,
 	},
+	Route{
+		"Update",
+		"GET",
+		"/update",
+		Update,
+	},
 }

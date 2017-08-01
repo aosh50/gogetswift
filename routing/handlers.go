@@ -18,3 +18,8 @@ func Drones(w http.ResponseWriter, r *http.Request) {
 	result := d.GetDrones(r)	
 	WriteContent(w, result)	
 }
+
+func Update(w http.ResponseWriter, r *http.Request) {
+	result := d.UpdateDronePositions(r)	
+	WriteContent(w, result)	
+}
