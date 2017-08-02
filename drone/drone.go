@@ -3,10 +3,10 @@ package drone
 import (
 	l "getswift/location"
 	p "getswift/parcel"
-	// "fmt"
+	"fmt"
 	"io/ioutil"
 	"net/http"	
-	// "github.com/gorilla/schema"
+	"github.com/gorilla/schema"
 	"encoding/json"
 )
 
@@ -39,6 +39,8 @@ func GetDrones(r *http.Request) ([]byte) {
     	
     	dat[i].DistanceFromDepot() 
     	dat[i].DistanceFromDelivery()
+    	// dat[i].Location.GetPlace()
+    	dat[i].Location.Place = "Loading..."
 	}
 
     out, _ := json.Marshal(dat)
@@ -46,8 +48,18 @@ func GetDrones(r *http.Request) ([]byte) {
 }
 
 func UpdateDronePositions(r *http.Request) ([]byte) {
-	dat := make([]Drone,0)	
-	out, _ := json.Marshal(dat)
+	err := r.ParseForm()
+    if err != nil {
+            // Handle error
+    }
+
+    var drones []Drone
+
+    decoder := schema.NewDecoder()
+    decoder.Decode(&drones, r.PostForm)
+    fmt.Println(drones)
+
+	out, _ := json.Marshal(drones)
     return out  
 }
 

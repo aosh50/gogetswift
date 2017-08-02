@@ -5,6 +5,7 @@ import (
 	"net/http"
 	d "getswift/drone"
 	p "getswift/parcel"
+	gs "getswift/delivery"	
 	)
 func Test(w http.ResponseWriter, r *http.Request) {
 	// d.GetDrones()	
@@ -20,6 +21,12 @@ func Drones(w http.ResponseWriter, r *http.Request) {
 }
 
 func Update(w http.ResponseWriter, r *http.Request) {
-	result := d.UpdateDronePositions(r)	
+	// result := d.UpdateDronePositions(r)	
+	// WriteContent(w, result)	
+	gs.UpdateDelivery(r)
+}
+
+func LoadLocation(w http.ResponseWriter, r *http.Request) {
+	result := p.ParcelPlace(r)	
 	WriteContent(w, result)	
 }
