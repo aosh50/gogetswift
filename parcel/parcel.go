@@ -12,9 +12,12 @@ import (
 type Parcel struct {
 	PackageId 		int64
 	Destination 	l.Location
-	Deadline		int64
+	Deadline		float64
 	Distance 		float64
 	DeliveryTime 	float64
+	FlightTime 		float64
+	ETD 			float64
+	DroneDelivered  int
 }
 
 func GetParcels(r *http.Request) ([]byte) {
@@ -36,7 +39,7 @@ func GetParcels(r *http.Request) ([]byte) {
     for i := 0; i < len(dat); i++ { //Calculate starting distances    	
     	dat[i].DistanceFromDelivery()
     	// dat[i].Destination.GetPlace()
-    	dat[i].Destination.Place = "Loading..."
+    	dat[i].Destination.Place = "Loading..."    	
 	}
 
     out, _ := json.Marshal(dat)
@@ -51,7 +54,8 @@ func (parcel *Parcel) DistanceFromDelivery() {
 
 	
 	parcel.Distance = parcel.Destination.DistanceBetween(depotLocation)
-	// parcel.DeliveryTime = parcel.Distance / 20 * 3600;
+	parcel.FlightTime = parcel.Distance / 20 * 3600;
+	parcel.ETD = parcel.Deadline - parcel.FlightTime;
 
 }
 

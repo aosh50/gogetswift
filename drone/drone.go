@@ -41,6 +41,9 @@ func GetDrones(r *http.Request) ([]byte) {
     	dat[i].DistanceFromDelivery()
     	// dat[i].Location.GetPlace()
     	dat[i].Location.Place = "Loading..."
+    	if len(dat[i].Packages) > 0 {
+    		dat[i].Packages[0].DroneDelivered = dat[i].DroneId
+    	}
 	}
 
     out, _ := json.Marshal(dat)
